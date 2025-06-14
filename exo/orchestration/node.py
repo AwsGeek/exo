@@ -484,7 +484,7 @@ class Node:
     if DEBUG >= 2:
       print(f"update_peers: added={peers_added} removed={peers_removed} updated={peers_updated} unchanged={peers_unchanged} to_disconnect={peers_to_disconnect} to_connect={peers_to_connect}")
 
-    async def disconnect_with_timeout(peer, timeout=5):
+    async def disconnect_with_timeout(peer, timeout=30):
       try:
         await asyncio.wait_for(peer.disconnect(), timeout)
         return True
@@ -493,7 +493,7 @@ class Node:
         traceback.print_exc()
         return False
 
-    async def connect_with_timeout(peer, timeout=5):
+    async def connect_with_timeout(peer, timeout=30):
       try:
         await asyncio.wait_for(peer.connect(), timeout)
         return True
@@ -560,7 +560,7 @@ class Node:
         continue
 
       try:
-        other_topology = await asyncio.wait_for(peer.collect_topology(visited, max_depth=max_depth - 1), timeout=5.0)
+        other_topology = await asyncio.wait_for(peer.collect_topology(visited, max_depth=max_depth - 1), timeout=30.0)
         if DEBUG >= 2: print(f"Collected topology from: {peer.id()}: {other_topology}")
         next_topology.merge(peer.id(), other_topology)
       except Exception as e:
@@ -589,7 +589,7 @@ class Node:
     if DEBUG >= 2: print(f"Broadcasting result: {request_id=} {result=} {is_finished=}")
     async def send_result_to_peer(peer):
       try:
-        await asyncio.wait_for(peer.send_result(request_id, result, is_finished), timeout=15.0)
+        await asyncio.wait_for(peer.send_result(request_id, result, is_finished), timeout=60.0)
       except asyncio.TimeoutError:
         print(f"Timeout broadcasting result to {peer.id()}")
       except Exception as e:
@@ -603,7 +603,7 @@ class Node:
 
     async def send_status_to_peer(peer):
       try:
-        await asyncio.wait_for(peer.send_opaque_status(request_id, status), timeout=15.0)
+        await asyncio.wait_for(peer.send_opaque_status(request_id, status), timeout=60.0)
       except asyncio.TimeoutError:
         print(f"Timeout sending opaque status to {peer.id()}")
       except Exception as e:
